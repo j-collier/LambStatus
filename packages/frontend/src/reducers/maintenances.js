@@ -4,7 +4,9 @@ import { LIST_MAINTENANCES, LIST_MAINTENANCE, ADD_MAINTENANCE, EDIT_MAINTENANCE,
 function listMaintenancesHandler (state = { }, action) {
   const maintenances = action.maintenances
   maintenances.sort((a, b) => {
-    return a.createdAt < b.createdAt
+    if (a.createdAt < b.createdAt) return 1
+    if (a.createdAt > b.createdAt) return -1
+    return 0
   })
 
   return Object.assign({}, state, {
@@ -14,7 +16,9 @@ function listMaintenancesHandler (state = { }, action) {
 
 function listMaintenanceHandler (state = { }, action) {
   action.maintenance.maintenanceUpdates.sort((a, b) => {
-    return a.createdAt < b.createdAt
+    if (a.createdAt < b.createdAt) return 1
+    if (a.createdAt > b.createdAt) return -1
+    return 0
   })
 
   const newMaintenances = state.maintenances.map((maintenance) => {
@@ -30,26 +34,22 @@ function listMaintenanceHandler (state = { }, action) {
 }
 
 function addMaintenanceHandler (state = { }, action) {
-  const {
-    maintenance
-  } = action.response
+  delete action.response.components
 
   return Object.assign({}, state, {
     maintenances: [
-      maintenance,
+      action.response,
       ...state.maintenances
     ]
   })
 }
 
 function editMaintenanceHandler (state = { }, action) {
-  const {
-    maintenance: updatedMaintenance
-  } = action.response
+  delete action.response.components
 
   const newMaintenances = state.maintenances.map((maintenance) => {
-    if (maintenance.maintenanceID === updatedMaintenance.maintenanceID) {
-      return updatedMaintenance
+    if (maintenance.maintenanceID === action.response.maintenanceID) {
+      return action.response
     }
     return maintenance
   })
